@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Форма отправки данных о грузоперевозках</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    :root {
+      --tg-blue: #0088cc;
+      --tg-background: #f7f7f7;
+      --tg-message-in: #e5e5ea;
+      --tg-message-out: #d2f4ff;
+      --contact-highlight-color: #3498db; /* Цвет выделения контакта */
+    }
+    body {
+      background-color: var(--tg-background);
+      font-family: 'Roboto', sans-serif;
+      font-weight: 300;
+      color: #000;
+      margin: 0;
+      padding: 20px;
+      max-width: 340px;
+      margin-left: auto;
+      margin-right: auto;
+      border: none;
+    }
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-bottom: 10px;
+      border: 1px solid #dfe6e9;
+      width: 340;
+    }
+    input, textarea, button, select {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 300;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #dfe6e9;
+      padding: 7px;
+      width: calc(100% - 18px);
+      box-sizing: border-box;
+      width: 100%;
+    }
+    button {
+      background-color: var(--tg-blue);
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #0099e6;
+    }
+    .message {
+      background-color: var(--tg-message-in);
+      border-left: 3px solid var(--tg-blue);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .message:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .message-preview {
+      font-weight: 100;
+      color: var(--tg-blue);
+    }
+    .message-content {
+      border-top: 2px solid var(--tg-blue);
+      padding-top: 10px;
+      display: none;
+    }
+    .message.active .message-content {
+      display: block;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0);
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: #fefefe00;
+      margin: 2% auto;
+      padding: 20px;
+     
+      width: 340px;
+    }
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .role-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding: 7.5px;
+      font-size: 0.8em;
+    }
+    .role-button {
+      flex: 1;
+      margin-right: 5px;
+      background-color: var(--tg-blue);
+      color: white;
+      padding: 7.5px;
+      font-size: 0.8em;
+    }
+    .role-button:last-child {
+      margin-right: 0;
+    }
+    .role-button.active {
+      background-color: #006699;
+    }
+    .search-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .search-container input[type="text"] {
+      flex: 1;
+      margin-right: 5px;
+    }
+    .search-container input[type="text"]:last-child {
+      margin-right: 0;
+    }
+      .contact-highlight {
+      color: var(--contact-highlight-color); /* Использование переменной для цвета */
+    }
+   .contact-highlight {
+  color: #3498db; /* Вы можете изменить код цвета на предпочитаемый */
+}
+  </style>
+</head>
+<body>
+  <button id="myBtn">+ Добавить заказ</button>
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <form id="myForm" action="/additem" method="post">
+        <input type="hidden" id="roleInput" name="role">
+        <div class="role-buttons">
+          <button type="button" class="role-button" onclick="setRole('Отправлю', this)">Отправить</button>
+          <button type="button" class="role-button" onclick="setRole('Увезу', this)">Увезти</button>
+        </div>
+        <input type="text" name="from" placeholder="Откуда" required>
+        <input type="text" name="to" placeholder="Куда" required>
+        <input type="date" name="date" required>
+        <input type="number" name="price" placeholder="Цена" required>
+        <input type="number" name="weight" placeholder="Вес" required>
+        <input type="text" name="contact" placeholder="Контакт" required>
+        <textarea name="message" placeholder="Сообщение"></textarea>
+        <button type="submit">Отправить</button>
+      </form>
+    </div>
+  </div>
+  <div class="search-container">
+    <input type="text" id="searchFrom" placeholder="Откуда">
+    <input type="text" id="searchTo" placeholder="Куда">
+  </div>
+  <div id="itemsContainer"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('/api/items')
+        .then(response => response.json())
+        .then(items => {
+          const itemsContainer = document.getElementById('itemsContainer');
+          items.forEach(item => {
+            let message = document.createElement('div');
+            message.classList.add('message');
+            message.addEventListener('click', function() {
+              this.classList.toggle('active');
+            });
+            let messagePreview = document.createElement('div');
+            messagePreview.classList.add('message-preview');
+            messagePreview.textContent = `${item.role} из ${item.from} в ${item.to}`;
+            let messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            messageContent.innerHTML = `
+              <p>Дата: <span>${new Date(item.date).toLocaleDateString()}</span></p>
+              <p>Цена: <span>${item.price}</span> Вес: <span>${item.weight}</span></p>
+              <p>Контакт: <span onclick="copyContact(this)">${item.contact}</span></p>
+              <p>Сообщение: <span>${item.message}</span></p>
+            `;
+            message.appendChild(messagePreview);
+            message.appendChild(messageContent);
+            if (itemsContainer.firstChild) {
+              itemsContainer.insertBefore(message, itemsContainer.firstChild);
+            } else {
+              itemsContainer.appendChild(message);
+            }
+            
+          });
+          const contactElements = document.querySelectorAll('.message-content span');
+    contactElements.forEach(element => {
+      element.classList.add('contact-highlight');
+    });
+        })
+        
+        .catch(error => console.error('Ошибка:', error));
+      function filterMessages() {
+        const searchFrom = document.getElementById('searchFrom').value.toLowerCase();
+        const searchTo = document.getElementById('searchTo').value.toLowerCase();
+        const messages = document.querySelectorAll('.message');
+        messages.forEach(message => {
+          const fromText = message.querySelector('.message-preview').textContent.toLowerCase();
+          const toText = message.querySelector('.message-preview').textContent.toLowerCase();
+          if (fromText.includes(searchFrom) && toText.includes(searchTo)) {
+            message.style.display = '';
+          } else {
+            message.style.display = 'none';
+          }
+        });
+      }
+      document.getElementById('searchFrom').addEventListener('input', filterMessages);
+      document.getElementById('searchTo').addEventListener('input', filterMessages);
+    });
+    var modal = document.getElementById('myModal');
+    var btn = document.getElementById('myBtn');
+    var span = document.getElementsByClassName('close')[0];
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+    function copyContact(element) {
+    const contactText = element.textContent || element.innerText;
+    copyToClipboard(contactText);
+    alert('Контакт скопирован: ' + contactText);
+    element.classList.add('contact-highlight'); // Добавление класса для выделения
+  }
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+
+    function setRole(role, element) {
+      const roleInput = document.getElementById('roleInput');
+      roleInput.value = role;
+      const buttons = document.querySelectorAll('.role-button');
+      buttons.forEach(button => {
+        button.classList.remove('active');
+      });
+      element.classList.add('active');
+    }
+
+    // Обновленная функция для установки роли и изменения стиля кнопок
+    function setRole(role, element) {
+      const roleInput = document.getElementById('roleInput');
+      roleInput.value = role;
+      const buttons = document.querySelectorAll('.role-button');
+      buttons.forEach(button => {
+        button.classList.remove('active');
+      });
+      element.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
