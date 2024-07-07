@@ -1,0 +1,21 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model FormData {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  fromField String?
+  to        String?
+  date      DateTime?
+  weight    Float?
+  price     Float?
+  contact   String?
+  messages  String?
+}
