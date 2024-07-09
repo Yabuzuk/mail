@@ -1,0 +1,76 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model TokenWallet {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tokenBalance Int?
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
+}
+
+model Application {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  description String?
+  status      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+}
+
+model Rating {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ratingValue Int?
+  comment     String?
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+}
+
+model Feedback {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  feedbackContent String?
+  rating          Int?
+  user            User?    @relation(fields: [userId], references: [id])
+  userId          String?
+}
+
+model Affiliate {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  referredUser String?
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
+}
+
+model User {
+  id               String        @id @default(cuid())
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  firstName        String?
+  lastName         String?
+  username         String        @unique
+  email            String?       @unique
+  password         String
+  roles            Json
+  fullName         String?
+  phoneNumber      String?
+  socialMediaLinks String?
+  applications     Application[]
+  tokenWallets     TokenWallet[]
+  ratings          Rating[]
+  feedbacks        Feedback[]
+  affiliates       Affiliate[]
+}
